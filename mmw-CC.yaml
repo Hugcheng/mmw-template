@@ -78,20 +78,9 @@ dns:
 
 # ===== 节点列表 =====
 # 链式代理用法示例（接机场时参考）：
-proxies: []
 
 # ===== 策略组 =====
 proxy-groups:
-  - name: 😊━━━ Have a Nice Day ━━━
-    type: select
-    proxies:
-      - DIRECT
-
-  - name: ❤All the best
-    type: select
-    proxies:
-      - DIRECT
-
   - name: Chain
     type: select
     proxies:
