@@ -84,7 +84,7 @@ proxy-groups:
   - name: Chain
     type: select
     proxies:
-      - 😊━━━ Have a Nice Day ━━━
+      - Have a Nice Day😊
       - ❤All the best
       - DIRECT
 
@@ -93,7 +93,7 @@ proxy-groups:
     include-all: true
     filter: "(?i)(at&t|\\batt\\b|verizon|vzw|\\bt-?mobile|\\btmo\\b)"
     proxies:
-      - 😊━━━ Have a Nice Day ━━━
+      -  Have a Nice Day😊
       - ❤All the best
       - Global
       - DIRECT
@@ -102,7 +102,7 @@ proxy-groups:
     type: select
     include-all: true
     proxies:
-      - 😊━━━ Have a Nice Day ━━━
+      -  Have a Nice Day😊
       - ❤All the best
       - DIRECT
       - REJECT
