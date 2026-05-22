@@ -1,0 +1,327 @@
+external-controller: 127.0.0.1:9090
+external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# ===== 嗅探配置 =====
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
+
+# ===== TUN 模式 =====
+tun:
+  enable: true
+  stack: mixed
+  dns-hijack:
+    - "any:53"
+    - "tcp://any:53"
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+
+# ===== DNS（家宽极速兼容版）=====
+dns:
+  enable: true
+  ipv6: false
+  respect-rules: true
+  enhanced-mode: fake-ip
+
+  fake-ip-filter:
+    - "+.lan"
+    - "+.local"
+    - "+.market.xiaomi.com"
+
+  nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+
+  proxy-server-nameserver:
+    - 223.5.5.5
+    - https://1.1.1.1/dns-query
+    - https://dns.google/dns-query
+
+  nameserver-policy:
+    geosite:cn:
+      - 119.29.29.29
+      - 223.5.5.5
+    geosite:private:
+      - 119.29.29.29
+      - 223.5.5.5
+    geosite:geolocation-!cn:
+      - https://1.1.1.1/dns-query#Global
+      - https://dns.google/dns-query#Global
+
+
+# ===== 1. 机场中转=====
+#proxy-providers:
+#  airport:
+#    type: http
+#    url: "https://resourcemap.lol/sub?token=Y8inLC4gbMX12LMj_B3GUbxyEPp7VQ2N-rj9hLeBk_s&type=sip002&protocol=ss2022&use=foreign&rule=nodelist"
+#    interval: 3600
+#    health-check:
+#      enable: true
+#      url: http://www.gstatic.com/generate_204
+#      interval: 300
+
+
+# ===== 节点列表 =====
+# 链式代理用法示例（接机场时参考）：
+proxies: []
+
+# ===== 策略组 =====
+proxy-groups:
+  - name: 😊━━━ Have a Nice Day ━━━
+    type: select
+    proxies:
+      - DIRECT
+
+  - name: ❤All the best
+    type: select
+    proxies:
+      - DIRECT
+
+  - name: Chain
+    type: select
+    proxies:
+      - 😊━━━ Have a Nice Day ━━━
+      - ❤All the best
+      - DIRECT
+
+  - name: AI
+    type: select
+    include-all: true
+    filter: "(?i)(at&t|\\batt\\b|verizon|vzw|\\bt-?mobile|\\btmo\\b)"
+    proxies:
+      - 😊━━━ Have a Nice Day ━━━
+      - ❤All the best
+      - Global
+      - DIRECT
+
+  - name: Global
+    type: select
+    include-all: true
+    proxies:
+      - 😊━━━ Have a Nice Day ━━━
+      - ❤All the best
+      - DIRECT
+      - REJECT
+
+# ===== 规则分流 =====
+rules:
+  - RULE-SET,Lan,DIRECT
+  - GEOSITE,category-ads-all,REJECT
+  - GEOSITE,private,DIRECT
+  - DOMAIN-KEYWORD,torrent,DIRECT
+  - DOMAIN-SUFFIX,m-team.cc,DIRECT
+  - RULE-SET,BiliBili,DIRECT
+  - RULE-SET,SteamCN,DIRECT
+
+  # ===== Apple 服务自定义分流 =====
+  # App Store 走代理
+  - DOMAIN-SUFFIX,apps.apple.com,Global
+  - DOMAIN-SUFFIX,itunes.apple.com,Global
+  - DOMAIN-SUFFIX,mzstatic.com,Global
+  - DOMAIN-SUFFIX,appstoreconnect.apple.com,Global
+  # iMessage / FaceTime 走代理(国外通信对方需要)
+  - DOMAIN-SUFFIX,facetime.apple.com,Global
+  - DOMAIN-SUFFIX,imessage.apple.com,Global
+  - DOMAIN-SUFFIX,ess.apple.com,Global
+  - DOMAIN-SUFFIX,ist.apple.com,Global
+  - DOMAIN-KEYWORD,facetime,Global
+  - DOMAIN-KEYWORD,imessage,Global
+  # iCloud 走代理(同步速度更快,但流量大)
+  - DOMAIN-SUFFIX,icloud.com,Global
+  - DOMAIN-SUFFIX,icloud-content.com,Global
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT       # 中国 iCloud(云上贵州)保持直连
+  - DOMAIN-SUFFIX,me.com,Global
+
+  # ===== AI 服务统一走 ATT / Verizon 节点 =====
+  # ⚠️ 必须放在 Google / Microsoft / GlobalMedia 等通用规则之前，否则会被先匹配走 Global
+  # --- AI 聊天/模型服务 ---
+  - DOMAIN-SUFFIX,anthropic.com,AI
+  - DOMAIN-SUFFIX,claude.ai,AI
+  - DOMAIN-SUFFIX,claude.com,AI
+  - DOMAIN-SUFFIX,x.ai,AI
+  - DOMAIN-SUFFIX,grok.com,AI
+  - DOMAIN-SUFFIX,perplexity.ai,AI
+  - DOMAIN-KEYWORD,perplexity,AI
+  # --- AI 编程工具 (Cursor / Antigravity / Codex / Claude Code) ---
+  - DOMAIN-SUFFIX,cursor.com,AI
+  - DOMAIN-SUFFIX,cursor.sh,AI
+  - DOMAIN-KEYWORD,cursor,AI
+  - DOMAIN-SUFFIX,antigravity.google,AI
+  - DOMAIN-KEYWORD,antigravity,AI
+  - DOMAIN,codex.openai.com,AI
+  - DOMAIN-KEYWORD,codex,AI
+  # Claude Code 走 api.anthropic.com，已被上方 anthropic.com 规则覆盖
+  # --- 规则集 ---
+  - RULE-SET,OpenAI,AI
+  - RULE-SET,Claude,AI
+  - RULE-SET,Gemini,AI
+  - RULE-SET,Copilot,AI
+
+  - RULE-SET,Apple,DIRECT
+  - RULE-SET,ChinaMax,DIRECT
+  - RULE-SET,Netflix,Global
+  - RULE-SET,Disney,Global
+  - RULE-SET,TikTok,Global
+  - RULE-SET,Steam,Global
+  - RULE-SET,Google,Global
+  - RULE-SET,Telegram,Global
+  - RULE-SET,Microsoft,Global
+  - RULE-SET,PayPal,Global
+  - RULE-SET,GlobalMedia,Global
+  - MATCH,Global
+# ===== 外部规则集 (完美合并版) =====
+rule-providers:
+  # MetaCubeX 基础分流规则
+  geolocation-cn:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-cn.mrs"
+    path: ./ruleset/geolocation-cn.mrs
+    interval: 86400
+  geolocation-!cn:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
+    path: ./ruleset/geolocation-!cn.mrs
+    interval: 86400
+  private:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"
+    path: ./ruleset/private.mrs
+    interval: 86400
+  cn:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"
+    path: ./ruleset/cn.mrs
+    interval: 86400
+  # BlackMatrix7 精细规则
+  Apple:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Apple/Apple_Classical_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Apple_No_Resolve.yaml
+  BiliBili:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/BiliBili_No_Resolve.yaml
+  Netflix:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Netflix/Netflix_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Netflix_No_Resolve.yaml
+  Disney:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Disney/Disney_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Disney_No_Resolve.yaml
+  TikTok:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TikTok/TikTok_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/TikTok_No_Resolve.yaml
+  GlobalMedia:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia_Classical_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/GlobalMedia_Classical_No_Resolve.yaml
+  # ===== AI 服务规则集 =====
+  OpenAI:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/OpenAI_No_Resolve.yaml
+  Claude:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Claude_No_Resolve.yaml
+  Gemini:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Gemini_No_Resolve.yaml
+  Copilot:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Copilot/Copilot_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Copilot_No_Resolve.yaml
+  Google:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Google_No_Resolve.yaml
+  Microsoft:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Microsoft/Microsoft_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Microsoft_No_Resolve.yaml
+  PayPal:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PayPal/PayPal_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/PayPal_No_Resolve.yaml
+  Telegram:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Telegram_No_Resolve.yaml
+  SteamCN:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/SteamCN/SteamCN_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/SteamCN_No_Resolve.yaml
+  Steam:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Steam/Steam_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Steam_No_Resolve.yaml
+  Lan:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/Lan_No_Resolve.yaml
+  ChinaMax:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/ChinaMax/ChinaMax_Classical_No_Resolve.yaml"
+    interval: 86400
+    path: ./ruleset/ChinaMax_Classical_No_Resolve.yaml
