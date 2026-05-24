@@ -135,6 +135,14 @@ rules:
   - DOMAIN-SUFFIX,icloud-content.com,Global
   - DOMAIN-SUFFIX,icloud.com.cn,DIRECT       # 中国 iCloud(云上贵州)保持直连
   - DOMAIN-SUFFIX,me.com,Global
+  
+  # ===== T-Mobile Wi-Fi Calling → 走美国节点(放在 AI 块前)=====
+  # ⚠️ 端口规则放最前,确保 IPsec 隧道流量优先命中
+  - DST-PORT,500,AI
+  - DST-PORT,4500,AI
+  - DOMAIN-KEYWORD,epdg,AI
+  - DOMAIN-KEYWORD,3gppnetwork,AI
+  - DOMAIN-SUFFIX,3gppnetwork.org,AI
 
   # ===== AI 服务统一走 ATT / Verizon 节点 =====
   # ⚠️ 必须放在 Google / Microsoft / GlobalMedia 等通用规则之前，否则会被先匹配走 Global
