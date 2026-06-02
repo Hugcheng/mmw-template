@@ -169,7 +169,6 @@ rules:
   - RULE-SET,Claude,AI
   - RULE-SET,Gemini,AI
   - RULE-SET,Copilot,AI
-
   - RULE-SET,Apple,DIRECT
   - RULE-SET,ChinaMax,DIRECT
   - RULE-SET,Netflix,Global
@@ -251,6 +250,12 @@ rule-providers:
     interval: 86400
     path: ./ruleset/GlobalMedia_Classical_No_Resolve.yaml
   # ===== AI 服务规则集 =====
+  AppleAI:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Accademia/Additional_Rule_For_Clash/main/AppleAI/AppleAI_Domain.yaml"
+    interval: 86400
+    path: ./ruleset/AppleAI_Domain.yaml
   OpenAI:
     type: http
     behavior: classical
