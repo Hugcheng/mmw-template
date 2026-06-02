@@ -18,7 +18,7 @@ sniffer:
       ports: [443, 8443]
   skip-domain:
     - "Mijia Cloud"
-    - "+.push.apple.com"
+
 
 # ===== TUN 模式 =====
 tun:
@@ -116,8 +116,9 @@ rules:
   - DOMAIN-SUFFIX,m-team.cc,DIRECT
   - RULE-SET,BiliBili,DIRECT
   - RULE-SET,SteamCN,DIRECT
-  # ===== Apple Intelligence / Siri ChatGPT =====
+  # ===== Apple Intelligence / Siri ChatGPT/Notification =====
   - RULE-SET,AppleAI,AI
+  - DOMAIN-SUFFIX,push.apple.com,Global
   # ===== Apple 服务自定义分流 =====
   # App Store 走代理
   - DOMAIN-SUFFIX,apps.apple.com,Global
@@ -131,11 +132,12 @@ rules:
   - DOMAIN-SUFFIX,ist.apple.com,Global
   - DOMAIN-KEYWORD,facetime,Global
   - DOMAIN-KEYWORD,imessage,Global
-  # iCloud 走代理(同步速度更快,但流量大)
+  # iCloud走代理(同步速度更快,但流量大)
   - DOMAIN-SUFFIX,icloud.com,Global
   - DOMAIN-SUFFIX,icloud-content.com,Global
   - DOMAIN-SUFFIX,icloud.com.cn,DIRECT       # 中国 iCloud(云上贵州)保持直连
   - DOMAIN-SUFFIX,me.com,Global
+
   
   # ===== T-Mobile Wi-Fi Calling → 走美国节点(放在 AI 块前)=====
   # ⚠️ 端口规则放最前,确保 IPsec 隧道流量优先命中
