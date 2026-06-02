@@ -116,7 +116,8 @@ rules:
   - DOMAIN-SUFFIX,m-team.cc,DIRECT
   - RULE-SET,BiliBili,DIRECT
   - RULE-SET,SteamCN,DIRECT
-
+  # ===== Apple Intelligence / Siri ChatGPT =====
+  - RULE-SET,AppleAI,AI
   # ===== Apple 服务自定义分流 =====
   # App Store 走代理
   - DOMAIN-SUFFIX,apps.apple.com,Global
