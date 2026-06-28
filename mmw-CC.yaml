@@ -5,7 +5,6 @@ profile:
   store-selected: true
   store-fake-ip: true
 
-# ===== 嗅探配置 =====
 sniffer:
   enable: true
   sniff:
@@ -19,8 +18,6 @@ sniffer:
   skip-domain:
     - "Mijia Cloud"
 
-
-# ===== TUN 模式 =====
 tun:
   enable: true
   stack: mixed
@@ -31,7 +28,6 @@ tun:
   auto-redirect: true
   auto-detect-interface: true
 
-# ===== DNS（家宽极速兼容版）=====
 dns:
   enable: true
   ipv6: false
@@ -42,6 +38,12 @@ dns:
     - "+.lan"
     - "+.local"
     - "+.market.xiaomi.com"
+    - "gspe1-ssl.ls.apple.com"
+    - "+.3gppnetwork.org"
+    - "+.attwifi.com"
+    - "+.vzwwo.com"
+    - "+.vodafone.com"
+    - "+.ondemandconnectivity.com"
 
   nameserver:
     - 119.29.29.29
@@ -63,23 +65,6 @@ dns:
       - https://1.1.1.1/dns-query#Global
       - https://dns.google/dns-query#Global
 
-
-# ===== 1. 机场中转=====
-#proxy-providers:
-#  airport:
-#    type: http
-#    url: "https://resourcemap.lol/sub?token=Y8inLC4gbMX12LMj_B3GUbxyEPp7VQ2N-rj9hLeBk_s&type=sip002&protocol=ss2022&use=foreign&rule=nodelist"
-#    interval: 3600
-#    health-check:
-#      enable: true
-#      url: http://www.gstatic.com/generate_204
-#      interval: 300
-
-
-# ===== 节点列表 =====
-# 链式代理用法示例（接机场时参考）：
-
-# ===== 策略组 =====
 proxy-groups:
   - name: Chain
     type: select
@@ -93,7 +78,7 @@ proxy-groups:
     include-all: true
     filter: "(?i)(at&t|\\batt\\b|verizon|vzw|\\bt-?mobile|\\btmo\\b)"
     proxies:
-      -  Have a nice Day😊
+      - Have a nice Day😊
       - ❤All the best
       - Global
       - DIRECT
@@ -102,12 +87,11 @@ proxy-groups:
     type: select
     include-all: true
     proxies:
-      -  Have a nice Day😊
+      - Have a nice Day😊
       - ❤All the best
       - DIRECT
       - REJECT
 
-# ===== 规则分流 =====
 rules:
   - RULE-SET,Lan,DIRECT
   - GEOSITE,category-ads-all,REJECT
@@ -116,40 +100,72 @@ rules:
   - DOMAIN-SUFFIX,m-team.cc,DIRECT
   - RULE-SET,BiliBili,DIRECT
   - RULE-SET,SteamCN,DIRECT
-  # ===== Apple Intelligence / Siri ChatGPT/Notification =====
+
+  # Apple Intelligence / Siri ChatGPT / Notification
   - RULE-SET,AppleAI,AI
   - DOMAIN-SUFFIX,push.apple.com,Global
-  # ===== Apple 服务自定义分流 =====
-  # App Store 走代理
+
+  # Apple 服务自定义分流
   - DOMAIN-SUFFIX,apps.apple.com,Global
   - DOMAIN-SUFFIX,itunes.apple.com,Global
   - DOMAIN-SUFFIX,mzstatic.com,Global
   - DOMAIN-SUFFIX,appstoreconnect.apple.com,Global
-  # iMessage / FaceTime 走代理(国外通信对方需要)
   - DOMAIN-SUFFIX,facetime.apple.com,Global
   - DOMAIN-SUFFIX,imessage.apple.com,Global
   - DOMAIN-SUFFIX,ess.apple.com,Global
   - DOMAIN-SUFFIX,ist.apple.com,Global
   - DOMAIN-KEYWORD,facetime,Global
   - DOMAIN-KEYWORD,imessage,Global
-  # iCloud走代理(同步速度更快,但流量大)
   - DOMAIN-SUFFIX,icloud.com,Global
   - DOMAIN-SUFFIX,icloud-content.com,Global
-  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT       # 中国 iCloud(云上贵州)保持直连
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT
   - DOMAIN-SUFFIX,me.com,Global
 
-  
-  # ===== T-Mobile Wi-Fi Calling → 走美国节点(放在 AI 块前)=====
-  # ⚠️ 端口规则放最前,确保 IPsec 隧道流量优先命中
-  - DST-PORT,500,AI
-  - DST-PORT,4500,AI
+  # Wi-Fi Calling / VoWiFi
+  - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc030.mcc234,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc033.mcc234,AI
+  - IP-CIDR,31.94.0.0/16,AI,no-resolve
+  - IP-CIDR,46.68.0.0/17,AI,no-resolve
+  - DOMAIN-KEYWORD,epdg.epc.mnc015.mcc234,AI
+  - DOMAIN-SUFFIX,entsrv-uk.vodafone.com,AI
+  - DOMAIN-SUFFIX,vuk-gto.prod.ondemandconnectivity.com,AI
+  - IP-CIDR,88.82.0.0/19,AI,no-resolve
+  - DOMAIN-KEYWORD,epdg.epc.mnc020.mcc234,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc010.mcc234,AI
+  - IP-CIDR,87.194.0.0/16,AI,no-resolve
+  - DOMAIN-KEYWORD,epdg.epc.mnc240.mcc310,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc260.mcc310,AI
+  - DOMAIN-SUFFIX,ss.epdg.epc.mnc260.mcc310.pub.3gppnetwork.org,AI
+  - IP-CIDR,208.54.0.0/16,AI,no-resolve
+  - IP-CIDR,66.94.0.0/19,AI,no-resolve
+  - DOMAIN-KEYWORD,epdg.epc.mnc410.mcc310,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc150.mcc311,AI
+  - DOMAIN-SUFFIX,attwifi.com,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc480.mcc311,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc012.mcc311,AI
+  - DOMAIN-SUFFIX,vzwwo.com,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc000.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc003.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc004.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc006.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc017.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc012.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc013.mcc454,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc001.mcc525,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc002.mcc525,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc005.mcc525,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc003.mcc525,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc005.mcc530,AI
+  - DOMAIN-KEYWORD,epdg.epc.mnc024.mcc530,AI
+  - DOMAIN-SUFFIX,pub.3gppnetwork.org,AI
+  - DOMAIN-SUFFIX,3gppnetwork.org,AI
   - DOMAIN-KEYWORD,epdg,AI
   - DOMAIN-KEYWORD,3gppnetwork,AI
-  - DOMAIN-SUFFIX,3gppnetwork.org,AI
+  - DST-PORT,500,AI
+  - DST-PORT,4500,AI
 
-  # ===== AI 服务统一走 ATT / Verizon 节点 =====
-  # ⚠️ 必须放在 Google / Microsoft / GlobalMedia 等通用规则之前，否则会被先匹配走 Global
-  # --- AI 聊天/模型服务 ---
+  # AI 服务
   - DOMAIN-SUFFIX,anthropic.com,AI
   - DOMAIN-SUFFIX,claude.ai,AI
   - DOMAIN-SUFFIX,claude.com,AI
@@ -157,7 +173,6 @@ rules:
   - DOMAIN-SUFFIX,grok.com,AI
   - DOMAIN-SUFFIX,perplexity.ai,AI
   - DOMAIN-KEYWORD,perplexity,AI
-  # --- AI 编程工具 (Cursor / Antigravity / Codex / Claude Code) ---
   - DOMAIN-SUFFIX,cursor.com,AI
   - DOMAIN-SUFFIX,cursor.sh,AI
   - DOMAIN-KEYWORD,cursor,AI
@@ -165,8 +180,6 @@ rules:
   - DOMAIN-KEYWORD,antigravity,AI
   - DOMAIN,codex.openai.com,AI
   - DOMAIN-KEYWORD,codex,AI
-  # Claude Code 走 api.anthropic.com，已被上方 anthropic.com 规则覆盖
-  # --- 规则集 ---
   - RULE-SET,OpenAI,AI
   - RULE-SET,Claude,AI
   - RULE-SET,Gemini,AI
@@ -183,9 +196,8 @@ rules:
   - RULE-SET,PayPal,Global
   - RULE-SET,GlobalMedia,Global
   - MATCH,Global
-# ===== 外部规则集 (完美合并版) =====
+
 rule-providers:
-  # MetaCubeX 基础分流规则
   geolocation-cn:
     type: http
     behavior: domain
@@ -214,7 +226,6 @@ rule-providers:
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"
     path: ./ruleset/cn.mrs
     interval: 86400
-  # BlackMatrix7 精细规则
   Apple:
     type: http
     behavior: classical
@@ -251,7 +262,6 @@ rule-providers:
     url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia_Classical_No_Resolve.yaml"
     interval: 86400
     path: ./ruleset/GlobalMedia_Classical_No_Resolve.yaml
-  # ===== AI 服务规则集 =====
   AppleAI:
     type: http
     behavior: domain
