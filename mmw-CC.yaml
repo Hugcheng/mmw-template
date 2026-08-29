@@ -39,6 +39,15 @@ dns:
     - "+.local"
     - "+.market.xiaomi.com"
     - "gspe1-ssl.ls.apple.com"
+    - "+.apple-dns.net"
+    - "+.icloud.com"
+    - "+.apple-relay.apple.com"
+    - "+.apple-relay.cloudflare.com"
+    - "+.apple-relay.fastly-edge.com"
+    - "+.cp4.cloudflare.com"
+    - "+.gateway.icloud.com"
+    - "+.ls.apple.com"
+    - "+.smoot.apple.com"
     - "+.3gppnetwork.org"
     - "+.attwifi.com"
     - "+.vzwwo.com"
@@ -101,6 +110,25 @@ rules:
   - RULE-SET,BiliBili,DIRECT
   - RULE-SET,SteamCN,DIRECT
 
+  # Apple Intelligence / Siri / iCloud Private Relay
+  - DOMAIN,guzzoni.apple.com,AI
+  - DOMAIN,mask-api.fe.apple-dns.net,AI
+  - DOMAIN,mask-api.icloud.com,AI
+  - DOMAIN,mask-t.apple-dns.net,AI
+  - DOMAIN,mask.apple-dns.net,AI
+  - DOMAIN-SUFFIX,apple-relay.apple.com,AI
+  - DOMAIN-SUFFIX,apple-relay.cloudflare.com,AI
+  - DOMAIN-SUFFIX,apple-relay.fastly-edge.com,AI
+  - DOMAIN-SUFFIX,apple-relay.mask.apple-dns.net,AI
+  - DOMAIN-SUFFIX,cp4.cloudflare.com,AI
+  - DOMAIN-SUFFIX,gateway.icloud.com,AI
+  - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,AI
+  - DOMAIN-SUFFIX,ls.apple.com,AI
+  - DOMAIN-SUFFIX,mask-h2.icloud.com,AI
+  - DOMAIN-SUFFIX,mask.icloud.com,AI
+  - DOMAIN-SUFFIX,smoot.apple.com,AI
+  - DOMAIN-SUFFIX,apps.mzstatic.com,AI
+
   # Apple Intelligence / Siri ChatGPT / Notification
   - RULE-SET,AppleAI,AI
   - DOMAIN-SUFFIX,push.apple.com,Global
@@ -122,7 +150,6 @@ rules:
   - DOMAIN-SUFFIX,me.com,Global
 
   # Wi-Fi Calling / VoWiFi
-  - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com,AI
   - DOMAIN-KEYWORD,epdg.epc.mnc030.mcc234,AI
   - DOMAIN-KEYWORD,epdg.epc.mnc033.mcc234,AI
   - IP-CIDR,31.94.0.0/16,AI,no-resolve
